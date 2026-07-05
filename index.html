@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summer Fun Read and Choose!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --sky: #3BBFEF;
+    --sun: #FFD43B;
+    --coral: #FF6B6B;
+    --mint: #51CF66;
+    --sand: #FFF3CD;
+    --cloud: #FFFFFF;
+    --deep-sky: #1A8FBF;
+    --dark-text: #1A2B3C;
+    --soft-purple: #CC5DE8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0F5 40%, #E0F7FA 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== CLOUDS ===== */
+  .sky-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+  }
+  .cloud {
+    position: absolute; background: white; border-radius: 50px; opacity: 0.85;
+    animation: float-cloud linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: ''; position: absolute; background: white; border-radius: 50%;
+  }
+  .c1 { width: 120px; height: 40px; top: 8%; left: -140px; animation-duration: 28s; }
+  .c1::before { width: 60px; height: 55px; top: -28px; left: 15px; }
+  .c1::after  { width: 45px; height: 40px; top: -20px; left: 55px; }
+  .c2 { width: 90px; height: 30px; top: 18%; left: -110px; animation-duration: 35s; animation-delay: -10s; }
+  .c2::before { width: 45px; height: 42px; top: -22px; left: 10px; }
+  .c2::after  { width: 35px; height: 30px; top: -14px; left: 40px; }
+  .c3 { width: 150px; height: 48px; top: 5%; left: -170px; animation-duration: 40s; animation-delay: -20s; }
+  .c3::before { width: 75px; height: 65px; top: -34px; left: 18px; }
+  .c3::after  { width: 55px; height: 48px; top: -24px; left: 70px; }
+  @keyframes float-cloud { from { left: -200px; } to { left: 110%; } }
+
+  /* ===== SUN ===== */
+  .sun {
+    position: fixed; top: 20px; right: 30px; width: 80px; height: 80px;
+    background: var(--sun); border-radius: 50%; z-index: 1;
+    box-shadow: 0 0 0 12px rgba(255,212,59,0.25), 0 0 0 24px rgba(255,212,59,0.12);
+    animation: pulse-sun 3s ease-in-out infinite;
+  }
+  .sun::before {
+    content: '😊'; font-size: 40px; position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+  @keyframes pulse-sun { 0%,100% { box-shadow: 0 0 0 12px rgba(255,212,59,0.25), 0 0 0 24px rgba(255,212,59,0.12); } 50% { box-shadow: 0 0 0 18px rgba(255,212,59,0.3), 0 0 0 36px rgba(255,212,59,0.15); } }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; position: relative; z-index: 2; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+  /* ===== WELCOME SCREEN ===== */
+  #welcome {
+    text-align: center;
+  }
+  .title-banner {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    border-radius: 30px;
+    padding: 24px 40px;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.15), 0 12px 30px rgba(255,107,107,0.4);
+    margin-bottom: 20px;
+    transform: rotate(-1deg);
+  }
+  .title-banner h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    color: white;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+  }
+  .title-banner p {
+    color: rgba(255,255,255,0.9);
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 700;
+    margin-top: 6px;
+  }
+
+  .welcome-emojis { font-size: 3rem; margin: 16px 0; animation: bounce-row 1.5s ease-in-out infinite; }
+  @keyframes bounce-row { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  .info-card {
+    background: white;
+    border-radius: 24px;
+    padding: 20px 30px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .info-card p { font-size: 1.1rem; color: var(--dark-text); line-height: 1.6; font-weight: 600; }
+  .info-card .steps { list-style: none; padding: 0; margin-top: 12px; }
+  .info-card .steps li { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 1rem; color: #444; font-weight: 700; }
+  .info-card .steps li span.icon { font-size: 1.4rem; }
+
+  .btn-start {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, var(--mint), #2ECC71);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.2), 0 10px 25px rgba(81,207,102,0.4);
+    transition: transform 0.1s, box-shadow 0.1s;
+    letter-spacing: 1px;
+  }
+  .btn-start:hover { transform: translateY(-3px); box-shadow: 0 9px 0 rgba(0,0,0,0.2), 0 14px 30px rgba(81,207,102,0.4); }
+  .btn-start:active { transform: translateY(2px); box-shadow: 0 3px 0 rgba(0,0,0,0.2); }
+
+  /* ===== GAME SCREEN ===== */
+  #game { padding: 16px; }
+
+  .top-bar {
+    width: 100%; max-width: 700px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+  }
+  .progress-wrap { flex: 1; }
+  .progress-label { font-size: 0.85rem; font-weight: 800; color: var(--dark-text); margin-bottom: 4px; }
+  .progress-bar { background: rgba(255,255,255,0.5); border-radius: 20px; height: 14px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--sun), var(--coral));
+    border-radius: 20px; transition: width 0.5s ease;
+  }
+  .score-badge {
+    background: var(--sun); border-radius: 50px; padding: 8px 18px;
+    font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: #8B5E00;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+  }
+
+  .question-card {
+    background: white;
+    border-radius: 28px;
+    padding: 28px 32px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    max-width: 700px; width: 100%;
+    margin-bottom: 20px;
+    border-top: 6px solid var(--coral);
+  }
+  .q-label {
+    font-size: 0.8rem; font-weight: 800; color: var(--coral);
+    text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;
+  }
+  .q-emoji { font-size: 3rem; display: block; margin-bottom: 10px; }
+  .q-text {
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    font-weight: 800; color: var(--dark-text); line-height: 1.55;
+  }
+
+  .choices-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 700px; width: 100%;
+  }
+  .choice-btn {
+    background: white;
+    border: 3px solid #E8EDF2;
+    border-radius: 20px;
+    padding: 16px 14px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    font-weight: 800;
+    color: var(--dark-text);
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 0 #D0D7DF;
+    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+    text-align: left;
+  }
+  .choice-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 0 #C0C9D5;
+    border-color: var(--sky);
+  }
+  .choice-btn:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 2px 0 #D0D7DF; }
+  .choice-btn .letter {
+    min-width: 34px; height: 34px; border-radius: 50%;
+    background: #F0F4F8; display: flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka One', cursive; font-size: 1rem; color: #555;
+    flex-shrink: 0;
+  }
+  .choice-btn.correct { background: #E8FAF0; border-color: var(--mint); color: #1A7A3A; box-shadow: 0 4px 0 #A8DDB5; }
+  .choice-btn.correct .letter { background: var(--mint); color: white; }
+  .choice-btn.wrong { background: #FFF0F0; border-color: var(--coral); color: #B03030; box-shadow: 0 4px 0 #F5B0B0; }
+  .choice-btn.wrong .letter { background: var(--coral); color: white; }
+  .choice-btn:disabled { cursor: default; }
+
+  /* ===== FEEDBACK TOAST ===== */
+  .feedback {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+    background: white; border-radius: 24px; padding: 24px 40px; z-index: 100;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2); text-align: center;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .feedback.show { transform: translate(-50%, -50%) scale(1); }
+  .feedback-icon { font-size: 4rem; display: block; }
+  .feedback-text { font-family: 'Fredoka One', cursive; font-size: 1.8rem; margin-top: 6px; }
+  .feedback.correct-fb .feedback-text { color: var(--mint); }
+  .feedback.wrong-fb .feedback-text { color: var(--coral); }
+  .feedback-sub { font-size: 1rem; font-weight: 700; color: #777; margin-top: 4px; }
+
+  /* ===== RESULTS SCREEN ===== */
+  #results { text-align: center; }
+  .results-card {
+    background: white; border-radius: 32px; padding: 36px 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12); max-width: 480px; width: 100%;
+  }
+  .trophy { font-size: 5rem; display: block; animation: trophy-bounce 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.2s both; }
+  @keyframes trophy-bounce { from { transform: scale(0) rotate(-15deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+  .results-title { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--dark-text); margin: 12px 0 6px; }
+  .results-score { font-size: 3.5rem; font-family: 'Fredoka One', cursive; color: var(--coral); }
+  .results-sub { font-size: 1rem; font-weight: 700; color: #888; margin-bottom: 20px; }
+  .results-msg { background: #F8F9FA; border-radius: 16px; padding: 14px 20px; font-size: 1.05rem; font-weight: 700; color: #444; margin-bottom: 24px; line-height: 1.5; }
+  .stars { font-size: 2.5rem; margin: 8px 0 16px; }
+  .btn-play-again {
+    font-family: 'Fredoka One', cursive; font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--coral), #FF8E53);
+    color: white; border: none; border-radius: 50px;
+    padding: 14px 40px; cursor: pointer;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+    transition: transform 0.1s; display: block; width: 100%; margin-bottom: 10px;
+  }
+  .btn-play-again:hover { transform: translateY(-2px); }
+  .btn-restart {
+    background: none; border: 3px solid #DDD; border-radius: 50px;
+    padding: 10px 30px; font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 800; color: #888; cursor: pointer;
+    width: 100%; transition: border-color 0.2s;
+  }
+  .btn-restart:hover { border-color: var(--sky); color: var(--deep-sky); }
+
+  /* ===== CONFETTI ===== */
+  .confetti-piece {
+    position: fixed; width: 10px; height: 10px; top: -20px;
+    border-radius: 2px; animation: confetti-fall linear forwards;
+    z-index: 50; pointer-events: none;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg) translateX(var(--drift)); opacity: 0; }
+  }
+
+  /* ===== SAND WAVE AT BOTTOM ===== */
+  .sand-wave {
+    position: fixed; bottom: 0; left: 0; width: 100%; pointer-events: none; z-index: 1;
+  }
+
+  .mute-btn {
+    position: fixed; bottom: 20px; right: 20px; z-index: 200;
+    background: white; border: 3px solid #DDD; border-radius: 50%;
+    width: 48px; height: 48px; font-size: 1.4rem; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mute-btn:hover { transform: scale(1.12); border-color: var(--sky); }
+
+  /* ===== NAME SCREEN ===== */
+  #name-screen { text-align: center; }
+  .name-card {
+    background: white; border-radius: 28px; padding: 32px 36px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-width: 460px; width: 100%;
+    border-top: 6px solid var(--sky);
+  }
+  .name-card h2 { font-family: 'Fredoka One', cursive; font-size: 1.9rem; color: var(--dark-text); margin-bottom: 6px; }
+  .name-card p  { font-size: 1rem; color: #777; font-weight: 700; margin-bottom: 22px; }
+  .name-input {
+    width: 100%; padding: 14px 20px; font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem; font-weight: 800; color: var(--dark-text);
+    border: 3px solid #E0E7EF; border-radius: 16px; outline: none;
+    text-align: center; transition: border-color 0.2s;
+    margin-bottom: 18px;
+  }
+  .name-input:focus { border-color: var(--sky); }
+  .name-input::placeholder { color: #BCC8D4; font-weight: 600; }
+  .btn-go {
+    font-family: 'Fredoka One', cursive; font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--sky), var(--deep-sky));
+    color: white; border: none; border-radius: 50px;
+    padding: 14px 48px; cursor: pointer;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.18);
+    transition: transform 0.1s; width: 100%;
+  }
+  .btn-go:hover { transform: translateY(-2px); }
+  .btn-go:disabled { opacity: 0.45; cursor: default; transform: none; }
+
+  /* ===== CERTIFICATE (print) ===== */
+  #certificate { text-align: center; }
+  .cert-wrap {
+    background: white; border-radius: 32px; padding: 36px 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12); max-width: 520px; width: 100%;
+    border: 5px solid var(--sun);
+    position: relative; overflow: hidden;
+  }
+  .cert-wrap::before {
+    content: ''; position: absolute; inset: 10px; border: 2px dashed rgba(255,212,59,0.4);
+    border-radius: 24px; pointer-events: none;
+  }
+  .cert-top { font-size: 2.6rem; margin-bottom: 4px; }
+  .cert-title { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--coral); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .cert-subtitle { font-size: 0.9rem; font-weight: 700; color: #AAA; margin-bottom: 20px; }
+  .cert-name-line { font-size: 0.95rem; font-weight: 700; color: #777; }
+  .cert-student-name { font-family: 'Fredoka One', cursive; font-size: 2.4rem; color: var(--deep-sky); margin: 2px 0 16px; }
+  .cert-achievement { background: linear-gradient(135deg, #FFF9E6, #FFF3CD); border-radius: 16px; padding: 14px 20px; margin-bottom: 18px; }
+  .cert-achievement p { font-size: 1rem; font-weight: 800; color: #7A5B00; line-height: 1.5; }
+  .cert-score-big { font-family: 'Fredoka One', cursive; font-size: 3rem; color: var(--coral); }
+  .cert-stars { font-size: 2rem; margin: 6px 0 12px; }
+  .cert-date { font-size: 0.85rem; color: #AAA; font-weight: 700; margin-bottom: 20px; }
+  .cert-footer { display: flex; justify-content: space-around; margin-top: 8px; }
+  .cert-sig { text-align: center; }
+  .cert-sig-line { width: 100px; height: 2px; background: #DDD; margin: 0 auto 4px; }
+  .cert-sig span { font-size: 0.75rem; color: #AAA; font-weight: 700; }
+  .btn-cert-print {
+    font-family: 'Fredoka One', cursive; font-size: 1.2rem;
+    background: linear-gradient(135deg, var(--sun), #FFA500);
+    color: white; border: none; border-radius: 50px;
+    padding: 12px 36px; cursor: pointer;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.18); width: 100%; margin-bottom: 10px;
+    transition: transform 0.1s;
+  }
+  .btn-cert-print:hover { transform: translateY(-2px); }
+  .btn-cert-row { display: flex; gap: 10px; }
+  .btn-cert-secondary {
+    flex: 1; background: none; border: 3px solid #DDD; border-radius: 50px;
+    padding: 10px; font-family: 'Nunito', sans-serif; font-size: 0.95rem;
+    font-weight: 800; color: #888; cursor: pointer; transition: border-color 0.2s;
+  }
+  .btn-cert-secondary:hover { border-color: var(--sky); color: var(--deep-sky); }
+
+  /* ===== PRINT STYLES ===== */
+  @media print {
+    body > *:not(#print-area) { display: none !important; }
+    #print-area { display: block !important; }
+    .no-print { display: none !important; }
+  }
+  #print-area { display: none; }
+
+  /* ===== NAME badge in top bar ===== */
+  .student-name-badge {
+    background: rgba(255,255,255,0.85); border-radius: 50px;
+    padding: 5px 14px; font-size: 0.85rem; font-weight: 800;
+    color: var(--deep-sky); white-space: nowrap; max-width: 130px;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+
+  @media (max-width: 480px) {
+    .choices-grid { grid-template-columns: 1fr; }
+    .question-card { padding: 20px; }
+    .title-banner { padding: 18px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background decoration -->
+<div class="sky-bg">
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+</div>
+<div class="sun"></div>
+<svg class="sand-wave" viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0,40 Q180,80 360,40 Q540,0 720,40 Q900,80 1080,40 Q1260,0 1440,40 L1440,80 L0,80 Z" fill="#F5DEB3" opacity="0.6"/>
+  <path d="M0,55 Q180,30 360,55 Q540,80 720,55 Q900,30 1080,55 Q1260,80 1440,55 L1440,80 L0,80 Z" fill="#DEB887" opacity="0.5"/>
+</svg>
+
+<!-- Mute button -->
+<button class="mute-btn" id="mute-btn" onclick="toggleMute()" title="Mute">🔊</button>
+
+<!-- ===== WELCOME SCREEN ===== -->
+<div id="welcome" class="screen active">
+  <div class="title-banner">
+    <h1>☀️ Summer Fun<br>Read & Choose! 🌊</h1>
+    <p>A Reading Comprehension Game</p>
+  </div>
+
+  <div class="welcome-emojis">🏖️ 🌺 🍦 🦀 🌴</div>
+
+  <div class="info-card">
+    <p>Read each summer sentence carefully, then pick the RIGHT answer!</p>
+    <ul class="steps">
+      <li><span class="icon">📖</span> Read the sentence slowly</li>
+      <li><span class="icon">🤔</span> Think about the answer</li>
+      <li><span class="icon">👆</span> Tap the best choice</li>
+      <li><span class="icon">⭐</span> Earn stars for every correct answer!</li>
+    </ul>
+  </div>
+
+  <button class="btn-start" onclick="goToNameScreen()">Let's Play! 🎉</button>
+</div>
+
+<!-- ===== NAME SCREEN ===== -->
+<div id="name-screen" class="screen">
+  <div class="name-card">
+    <div style="font-size:3rem;margin-bottom:10px;">🌟</div>
+    <h2>What's Your Name?</h2>
+    <p>Type your name so we can cheer for you!</p>
+    <input class="name-input" id="student-name-input" type="text"
+      maxlength="24" placeholder="e.g. Emma"
+      oninput="checkNameInput()"
+      onkeydown="if(event.key==='Enter') submitName()" />
+    <button class="btn-go" id="btn-go" onclick="submitName()" disabled>Start Reading! ☀️</button>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game" class="screen">
+  <div class="top-bar">
+    <div class="progress-wrap">
+      <div class="progress-label">Question <span id="q-num">1</span> of <span id="q-total">10</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="student-name-badge" id="name-badge">⭐ Player</div>
+    <div class="score-badge">⭐ <span id="score-disp">0</span></div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-label">Read & Choose!</div>
+    <span class="q-emoji" id="q-emoji">🏖️</span>
+    <p class="q-text" id="q-text">Loading...</p>
+  </div>
+
+  <div class="choices-grid" id="choices-grid"></div>
+</div>
+
+<!-- ===== FEEDBACK TOAST ===== -->
+<div class="feedback" id="feedback">
+  <span class="feedback-icon" id="fb-icon">🎉</span>
+  <div class="feedback-text" id="fb-text">Correct!</div>
+  <div class="feedback-sub" id="fb-sub"></div>
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div id="results" class="screen">
+  <div class="results-card">
+    <span class="trophy" id="trophy-emoji">🏆</span>
+    <div class="results-title" id="results-title">Amazing Job!</div>
+    <div class="results-score" id="results-score">8 / 10</div>
+    <div class="results-sub">correct answers</div>
+    <div class="stars" id="results-stars">⭐⭐⭐</div>
+    <div class="results-msg" id="results-msg">You are a summer reading superstar! 🌟</div>
+    <button class="btn-play-again" onclick="showCertificate()">🏅 Get My Certificate!</button>
+    <div class="btn-cert-row">
+      <button class="btn-cert-secondary" onclick="playAgain()">Play Again ☀️</button>
+      <button class="btn-cert-secondary" onclick="goHome()">Home 🏠</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CERTIFICATE SCREEN ===== -->
+<div id="certificate" class="screen">
+  <div class="cert-wrap">
+    <div class="cert-top">🏖️</div>
+    <div class="cert-title">Certificate of Achievement</div>
+    <div class="cert-subtitle">Summer Fun Read &amp; Choose!</div>
+    <div class="cert-name-line">This certificate is proudly awarded to</div>
+    <div class="cert-student-name" id="cert-name">Emma</div>
+    <div class="cert-achievement">
+      <p id="cert-achieve-text">Successfully completed the Summer Reading Challenge!</p>
+      <div class="cert-score-big" id="cert-score">8 / 10</div>
+    </div>
+    <div class="cert-stars" id="cert-stars">⭐⭐⭐</div>
+    <div class="cert-date" id="cert-date">June 2026</div>
+    <div class="cert-footer">
+      <div class="cert-sig">
+        <div class="cert-sig-line"></div>
+        <span>Teacher</span>
+      </div>
+      <div style="font-size:2rem;">☀️</div>
+      <div class="cert-sig">
+        <div class="cert-sig-line"></div>
+        <span>Date</span>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:16px;width:100%;max-width:520px;">
+    <button class="btn-cert-print no-print" onclick="printCertificate()">🖨️ Print Certificate</button>
+    <div class="btn-cert-row no-print">
+      <button class="btn-cert-secondary" onclick="playAgain()">Play Again ☀️</button>
+      <button class="btn-cert-secondary" onclick="goHome()">Home 🏠</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRINT AREA ===== -->
+<div id="print-area"></div>
+
+<script>
+// ===== SOUND ENGINE (Web Audio API - no external files needed) =====
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let ctx = null;
+
+function getCtx() {
+  if (!ctx) ctx = new AudioCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
+function playTone(frequency, type, duration, volume = 0.3, delay = 0) {
+  try {
+    const ac = getCtx();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, ac.currentTime + delay);
+    gain.gain.setValueAtTime(volume, ac.currentTime + delay);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + delay + duration);
+    osc.start(ac.currentTime + delay);
+    osc.stop(ac.currentTime + delay + duration);
+  } catch(e) {}
+}
+
+function soundClick() {
+  // Soft click for button hover
+  playTone(800, 'sine', 0.08, 0.15);
+}
+
+function soundCorrect() {
+  // Happy ascending chime: C-E-G-C
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((f, i) => playTone(f, 'sine', 0.25, 0.35, i * 0.1));
+  // Add sparkle
+  setTimeout(() => {
+    playTone(2093, 'sine', 0.15, 0.1);
+    playTone(1568, 'sine', 0.12, 0.08, 0.05);
+  }, 400);
+}
+
+function soundWrong() {
+  // Descending sad notes
+  playTone(400, 'sawtooth', 0.15, 0.2, 0);
+  playTone(300, 'sawtooth', 0.15, 0.2, 0.15);
+  playTone(220, 'sawtooth', 0.2,  0.25, 0.3);
+}
+
+function soundStart() {
+  // Fun rising fanfare
+  const notes = [392, 523, 659, 784, 1047];
+  notes.forEach((f, i) => playTone(f, 'triangle', 0.2, 0.3, i * 0.08));
+}
+
+function soundNextQ() {
+  // Short pop
+  playTone(660, 'sine', 0.06, 0.2, 0);
+  playTone(880, 'sine', 0.06, 0.15, 0.06);
+}
+
+function soundWin() {
+  // Victory fanfare
+  const melody = [523,523,523,415,523,659,784];
+  const timing = [0, 0.12, 0.24, 0.36, 0.48, 0.60, 0.72];
+  melody.forEach((f, i) => playTone(f, 'triangle', 0.3, 0.4, timing[i]));
+  // Celebration high notes
+  setTimeout(() => {
+    [1047,1175,1319].forEach((f,i) => playTone(f,'sine',0.2,0.25,i*0.12));
+  }, 900);
+}
+
+// ===== MUTE TOGGLE =====
+let isMuted = false;
+function toggleMute() {
+  isMuted = !isMuted;
+  const btn = document.getElementById('mute-btn');
+  btn.textContent = isMuted ? '🔇' : '🔊';
+  btn.title = isMuted ? 'Unmute sounds' : 'Mute sounds';
+}
+
+// Wrap all sounds with mute check
+const sound = {
+  click:   () => { if(!isMuted) soundClick(); },
+  correct: () => { if(!isMuted) soundCorrect(); },
+  wrong:   () => { if(!isMuted) soundWrong(); },
+  start:   () => { if(!isMuted) soundStart(); },
+  nextQ:   () => { if(!isMuted) soundNextQ(); },
+  win:     () => { if(!isMuted) soundWin(); },
+};
+
+// ===== STUDENT NAME =====
+let studentName = '';
+
+function goToNameScreen() {
+  sound.click();
+  showScreen('name-screen');
+  setTimeout(() => document.getElementById('student-name-input').focus(), 300);
+}
+
+function checkNameInput() {
+  const val = document.getElementById('student-name-input').value.trim();
+  document.getElementById('btn-go').disabled = val.length < 1;
+}
+
+function submitName() {
+  const val = document.getElementById('student-name-input').value.trim();
+  if (!val) return;
+  studentName = val.charAt(0).toUpperCase() + val.slice(1);
+  sound.start();
+  startGame();
+}
+
+// ===== QUESTIONS =====
+const questions = [
+  {
+    emoji: "🏖️",
+    text: "Mia went to the beach. She played in the waves and built a big sandcastle. What did Mia build at the beach?",
+    choices: ["A snowman", "A sandcastle", "A birdhouse", "A tent"],
+    correct: 1
+  },
+  {
+    emoji: "🍦",
+    text: "Jake was very hot after playing outside. He ate a cold ice cream cone. It was chocolate flavor. What flavor was Jake's ice cream?",
+    choices: ["Strawberry", "Vanilla", "Chocolate", "Blueberry"],
+    correct: 2
+  },
+  {
+    emoji: "🌴",
+    text: "The family packed their bags. They drove to a campsite near the lake. They put up their tent under a tall tree. Where did the family stay?",
+    choices: ["A hotel", "A tent", "Their house", "A boat"],
+    correct: 1
+  },
+  {
+    emoji: "🦋",
+    text: "Lily saw a yellow butterfly in the garden. It sat on a red flower. Then it flew away. What color was the butterfly?",
+    choices: ["Blue", "Pink", "Green", "Yellow"],
+    correct: 3
+  },
+  {
+    emoji: "🎣",
+    text: "Ben and his dad went fishing at the pond. They sat quietly and waited. Ben caught two big fish! How many fish did Ben catch?",
+    choices: ["One", "Three", "Two", "Five"],
+    correct: 2
+  },
+  {
+    emoji: "🌊",
+    text: "Sara loved to swim. Every morning she swam five laps in the pool. She wore a red swimsuit. What did Sara wear while swimming?",
+    choices: ["A yellow swimsuit", "A blue swimsuit", "A green swimsuit", "A red swimsuit"],
+    correct: 3
+  },
+  {
+    emoji: "🍉",
+    text: "At the picnic, Mom cut a big watermelon. It was sweet and juicy. Everyone got a slice. What fruit did Mom cut?",
+    choices: ["A pineapple", "A watermelon", "An orange", "A mango"],
+    correct: 1
+  },
+  {
+    emoji: "⛺",
+    text: "The kids looked up at the sky at night. They saw lots of shining stars. Tom counted ten stars. What did Tom count in the sky?",
+    choices: ["Clouds", "Birds", "Fireflies", "Stars"],
+    correct: 3
+  },
+  {
+    emoji: "🚲",
+    text: "Emma rides her bike every summer afternoon. She wears a purple helmet to stay safe. Where does Emma go every afternoon?",
+    choices: ["Swimming", "Bike riding", "Hiking", "Reading"],
+    correct: 1
+  },
+  {
+    emoji: "🌻",
+    text: "Grandma planted sunflowers in her garden. She watered them every day. By August, the flowers were very tall. Who planted the sunflowers?",
+    choices: ["Grandpa", "Mom", "Grandma", "A neighbor"],
+    correct: 2
+  }
+];
+
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let shuffled = [];
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function startGame() {
+  shuffled = shuffle(questions);
+  currentQ = 0;
+  score = 0;
+  document.getElementById('q-total').textContent = shuffled.length;
+  document.getElementById('name-badge').textContent = '👤 ' + studentName;
+  showScreen('game');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  const q = shuffled[currentQ];
+  document.getElementById('q-num').textContent = currentQ + 1;
+  document.getElementById('q-emoji').textContent = q.emoji;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('score-disp').textContent = score;
+  document.getElementById('prog-fill').style.width = ((currentQ / shuffled.length) * 100) + '%';
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span> ${c}`;
+    btn.onmouseenter = () => sound.click();
+    btn.onclick = () => checkAnswer(i, q.correct, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function checkAnswer(chosen, correct, btn) {
+  if (answered) return;
+  answered = true;
+
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[correct].classList.add('correct');
+
+  if (chosen === correct) {
+    score++;
+    btn.classList.add('correct');
+    sound.correct();
+    showFeedback(true, shuffled[currentQ].choices[correct]);
+  } else {
+    btn.classList.add('wrong');
+    sound.wrong();
+    showFeedback(false, shuffled[currentQ].choices[correct]);
+  }
+}
+
+function showFeedback(isCorrect, correctAnswer) {
+  const fb = document.getElementById('feedback');
+  const icon = document.getElementById('fb-icon');
+  const text = document.getElementById('fb-text');
+  const sub = document.getElementById('fb-sub');
+
+  const correctMessages = [
+    `Great job, ${studentName}! 🎉`,
+    `You got it, ${studentName}! ⭐`,
+    `Awesome, ${studentName}! 🌟`,
+    `Well done, ${studentName}! 🎊`,
+    `Super reader, ${studentName}! 📚`
+  ];
+  const wrongMessages = ["Not quite! 😊", "Try again next time!", "Good try!"];
+
+  fb.className = 'feedback ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+  icon.textContent = isCorrect ? ['🎉','⭐','🌟','🏆','🎊'][Math.floor(Math.random()*5)] : '😊';
+  text.textContent = isCorrect ? correctMessages[Math.floor(Math.random()*correctMessages.length)] : wrongMessages[Math.floor(Math.random()*3)];
+  sub.textContent = isCorrect ? '' : 'The answer is: ' + correctAnswer;
+  fb.classList.add('show');
+
+  setTimeout(() => {
+    fb.classList.remove('show');
+    setTimeout(nextQuestion, 300);
+  }, 1400);
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ < shuffled.length) {
+    sound.nextQ();
+    loadQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  document.getElementById('prog-fill').style.width = '100%';
+  const total = shuffled.length;
+  const pct = score / total;
+  let trophy, title, msg, stars;
+
+  if (pct === 1) {
+    trophy = '🏆'; title = `Perfect Score, ${studentName}!`;
+    msg = `${studentName} read every sentence perfectly! A summer reading superstar! 🌟`;
+    stars = '⭐⭐⭐';
+  } else if (pct >= 0.7) {
+    trophy = '🌟'; title = `Amazing Job, ${studentName}!`;
+    msg = `Wow, ${studentName} did a great job reading and choosing! Keep it up! 📚☀️`;
+    stars = '⭐⭐⭐';
+  } else if (pct >= 0.5) {
+    trophy = '😊'; title = `Good Effort, ${studentName}!`;
+    msg = `Nice try, ${studentName}! The more you read, the better you get! 🌊`;
+    stars = '⭐⭐';
+  } else {
+    trophy = '💪'; title = `Keep Trying, ${studentName}!`;
+    msg = `Reading takes practice, ${studentName}! You can do it! 🌺`;
+    stars = '⭐';
+  }
+
+  document.getElementById('trophy-emoji').textContent = trophy;
+  document.getElementById('results-title').textContent = title;
+  document.getElementById('results-score').textContent = score + ' / ' + total;
+  document.getElementById('results-msg').textContent = msg;
+  document.getElementById('results-stars').textContent = stars;
+
+  showScreen('results');
+  if (pct >= 0.7) { sound.win(); launchConfetti(); }
+  else { sound.nextQ(); }
+}
+
+// ===== CERTIFICATE =====
+function showCertificate() {
+  sound.click();
+  const total = shuffled.length;
+  const pct = score / total;
+  const now = new Date();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr = months[now.getMonth()] + ' ' + now.getFullYear();
+
+  let achieveText, stars;
+  if (pct === 1) {
+    achieveText = 'Achieved a PERFECT score in the Summer Reading Challenge! 🌟';
+    stars = '⭐⭐⭐';
+  } else if (pct >= 0.7) {
+    achieveText = 'Successfully completed the Summer Reading Challenge with excellent performance!';
+    stars = '⭐⭐⭐';
+  } else if (pct >= 0.5) {
+    achieveText = 'Completed the Summer Reading Challenge with good effort!';
+    stars = '⭐⭐';
+  } else {
+    achieveText = 'Participated in the Summer Reading Challenge. Keep practicing!';
+    stars = '⭐';
+  }
+
+  document.getElementById('cert-name').textContent = studentName;
+  document.getElementById('cert-achieve-text').textContent = achieveText;
+  document.getElementById('cert-score').textContent = score + ' / ' + total + ' correct';
+  document.getElementById('cert-stars').textContent = stars;
+  document.getElementById('cert-date').textContent = dateStr;
+
+  showScreen('certificate');
+  if (pct >= 0.7) launchConfetti();
+}
+
+function printCertificate() {
+  const total = shuffled.length;
+  const pct = score / total;
+  const now = new Date();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr = months[now.getMonth()] + ' ' + now.getFullYear();
+  let stars = pct === 1 ? '⭐⭐⭐' : pct >= 0.7 ? '⭐⭐⭐' : pct >= 0.5 ? '⭐⭐' : '⭐';
+  let level = pct === 1 ? 'Perfect Score! 🏆' : pct >= 0.7 ? 'Excellent! 🌟' : pct >= 0.5 ? 'Good Job! 😊' : 'Keep Practicing! 💪';
+
+  const printArea = document.getElementById('print-area');
+  printArea.innerHTML = `
+    <div style="font-family:'Nunito',sans-serif;max-width:680px;margin:30px auto;padding:40px;border:6px double #FFD43B;border-radius:20px;text-align:center;background:white;">
+      <div style="font-size:3.5rem;">🏖️ ☀️ 🌴</div>
+      <div style="font-size:0.8rem;font-weight:800;letter-spacing:3px;color:#FF6B6B;text-transform:uppercase;margin:8px 0;">Certificate of Achievement</div>
+      <h1 style="font-family:'Fredoka One',cursive;font-size:2.2rem;color:#1A2B3C;margin:4px 0;">Summer Fun Read &amp; Choose!</h1>
+      <p style="color:#888;font-weight:700;font-size:0.9rem;margin-bottom:24px;">Reading Comprehension Game</p>
+      <p style="color:#666;font-weight:700;font-size:1rem;margin-bottom:4px;">This certificate is proudly awarded to</p>
+      <div style="font-family:'Fredoka One',cursive;font-size:3rem;color:#1A8FBF;margin:4px 0 20px;">${studentName}</div>
+      <div style="background:#FFF9E6;border-radius:12px;padding:16px 24px;margin-bottom:16px;border:2px solid #FFD43B;">
+        <p style="font-weight:800;color:#7A5B00;font-size:1rem;margin-bottom:8px;">Score: <span style="font-size:1.8rem;font-family:'Fredoka One',cursive;color:#FF6B6B;">${score} / ${total}</span></p>
+        <p style="font-weight:800;color:#555;font-size:1rem;">${level}</p>
+        <div style="font-size:1.8rem;margin-top:6px;">${stars}</div>
+      </div>
+      <p style="color:#AAA;font-weight:700;font-size:0.85rem;margin-bottom:28px;">${dateStr}</p>
+      <div style="display:flex;justify-content:space-around;margin-top:16px;">
+        <div style="text-align:center;">
+          <div style="width:120px;height:1px;background:#DDD;margin:0 auto 6px;"></div>
+          <span style="font-size:0.75rem;color:#AAA;font-weight:700;">Teacher Signature</span>
+        </div>
+        <div style="font-size:2.5rem;">🌟</div>
+        <div style="text-align:center;">
+          <div style="width:120px;height:1px;background:#DDD;margin:0 auto 6px;"></div>
+          <span style="font-size:0.75rem;color:#AAA;font-weight:700;">Date</span>
+        </div>
+      </div>
+      <p style="margin-top:20px;font-size:0.75rem;color:#CCC;">☀️ Summer Fun Read &amp; Choose — TPT Digital Resource ☀️</p>
+    </div>
+  `;
+  window.print();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function playAgain() {
+  sound.start();
+  // Reset name input for new student
+  document.getElementById('student-name-input').value = '';
+  document.getElementById('btn-go').disabled = true;
+  showScreen('name-screen');
+}
+function goHome() { sound.click(); showScreen('welcome'); }
+
+function launchConfetti() {
+  const colors = ['#FF6B6B','#FFD43B','#51CF66','#3BBFEF','#CC5DE8','#FF8E53'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.width = (8 + Math.random() * 8) + 'px';
+      piece.style.height = (8 + Math.random() * 8) + 'px';
+      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      piece.style.setProperty('--drift', (Math.random() * 200 - 100) + 'px');
+      piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+      piece.style.animationDelay = (Math.random() * 1) + 's';
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), 5000);
+    }, i * 40);
+  }
+}
+</script>
+</body>
+</html>
